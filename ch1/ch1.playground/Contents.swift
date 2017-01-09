@@ -25,6 +25,7 @@ func isUniqueString(input : String) -> Bool {
 
 // Follow up answer requires a O(n^2) implementation comparing each character to the rest of string
 
+print("======= 1.1 Test Cases =======")
 print(isUniqueString(input: ""))
 print(isUniqueString(input: "abc"))
 print(isUniqueString(input: "aab"))
@@ -43,7 +44,7 @@ print(isUniqueString(input: "abcdeffg"))
 // Implementation
 func isPermutation(first: String,
                    second: String) -> Bool {
-  var asciiCharArray =  Array(repeating: 0, count: 128)
+  var asciiCharArray =  Array(repeating: 0, count: 256)
   var isPermutation = true
   for c in first.unicodeScalars {
     asciiCharArray[Int(c.value)] = asciiCharArray[Int(c.value)] + 1
@@ -62,6 +63,7 @@ func isPermutation(first: String,
   return isPermutation
 }
 
+print("======= 1.2 Test Cases =======")
 print(isPermutation(first: "abc", second: "cab"))
 print(isPermutation(first: "aabbcc", second: "ccaabb"))
 print(isPermutation(first: " c ba", second: "cba"))
@@ -95,6 +97,80 @@ func urlifyString(input: String,
   return urlifiedString
 }
 
+print("======= 1.3 Test Cases =======")
 print(urlifyString(input: "Mr John Smith   ", stringLength: 13))
 
+// 1.4
+// Given string, check if it is a permutation of a palindrome
+// Assume casing shouldn't matter, so lowercase them all
+// isPermutationOfPalindrome("Tact Coa") == true
+// Implementation
+func isPermutationOfPalindrome(input: String) -> Bool {
+  var isPermutationOfPalindrome = true
+  var asciiCharArray = Array(repeating: 0, count: 256)
+  var lowerCasedInputWithoutSpaces = input.lowercased().replacingOccurrences(of: " ", with: "")
+  if lowerCasedInputWithoutSpaces.characters.count % 2 == 0 {
+    return false
+  }
+  for c in lowerCasedInputWithoutSpaces.unicodeScalars {
+    asciiCharArray[Int(c.value)] = asciiCharArray[Int(c.value)] + 1
+  }
+  
+  var hasSeenMiddleCharacter = false
+  for value in asciiCharArray {
+    if value % 2 == 1 && !hasSeenMiddleCharacter {
+      hasSeenMiddleCharacter = true
+    } else if value % 2 == 1 && hasSeenMiddleCharacter {
+      isPermutationOfPalindrome = false
+      break
+    }
+  }
+  return isPermutationOfPalindrome
+}
+
+print("======= 1.4 Test Cases =======")
+print(isPermutationOfPalindrome(input: "Tact Coa"))
+print(isPermutationOfPalindrome(input: "Tact Co"))
+print(isPermutationOfPalindrome(input: "Ta"))
+print(isPermutationOfPalindrome(input: "Tat"))
+
+
+// 1.5
+// Can be three types of edits that can be performed on strings: insert, delete, replace.
+// Given two strings, write func to check if they are one edit (or zero) away
+// Assume all lower case
+// isOneAway("pale", "ple"), isOneAway("pales", "pale"), isOneAway("pale", "bale"), isOneAway("pale", "bake")
+// Implementation
+func isOneAway(first: String,
+               second: String) -> Bool {
+  var isOneAway = true
+  if abs(first.characters.count - second.characters.count) > 1 {
+    return false
+  }
+  var asciiCharArray = Array(repeating: 0, count: 256)
+  for c in first.unicodeScalars {
+    asciiCharArray[Int(c.value)] = asciiCharArray[Int(c.value)] + 1
+  }
+  
+  for c in second.unicodeScalars {
+    asciiCharArray[Int(c.value)] = asciiCharArray[Int(c.value)] - 1
+  }
+  
+  var hasSeenOnlyOneEdit = false
+  for value in asciiCharArray {
+    if abs(value) == 1 && !hasSeenOnlyOneEdit {
+      hasSeenOnlyOneEdit = true
+    } else if abs(value) == 1 && hasSeenOnlyOneEdit {
+      isOneAway = false
+    }
+  }
+  
+  return isOneAway
+}
+
+print("======= 1.5 Test Cases =======")
+print(isOneAway(first: "pale", second: "ple"))
+print(isOneAway(first: "pales", second: "pale"))
+print(isOneAway(first: "pale", second: "bale"))
+print(isOneAway(first: "pale", second: "bake"))
 
