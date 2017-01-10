@@ -134,7 +134,6 @@ print(isPermutationOfPalindrome(input: "Tact Co"))
 print(isPermutationOfPalindrome(input: "Ta"))
 print(isPermutationOfPalindrome(input: "Tat"))
 
-
 // 1.5
 // Can be three types of edits that can be performed on strings: insert, delete, replace.
 // Given two strings, write func to check if they are one edit (or zero) away
@@ -173,4 +172,66 @@ print(isOneAway(first: "pale", second: "ple"))
 print(isOneAway(first: "pales", second: "pale"))
 print(isOneAway(first: "pale", second: "bale"))
 print(isOneAway(first: "pale", second: "bake"))
+
+// 1.6
+// Given string, compress it by counting number of letters and forming a new string with count next to it
+// i.e "aabcccccaaa" would become "a2b1c5a3"
+// if original string is shorter, return original ie "a"
+// Notes:
+// First solution in mind is to just loop through each character. Keeping count and resetting and appending new string
+// Implementation
+func compressString(input: String) -> String {
+  var compressedString = ""
+  var characterCount = 0
+  var currentCharacter: Character = input.characters.first!
+  for c in input.characters {
+
+    if currentCharacter != c {
+      compressedString.append(currentCharacter)
+      compressedString += "\(characterCount)"
+      characterCount = 1
+      currentCharacter = c
+    } else {
+      characterCount += 1
+    }
+  }
+  compressedString.append(currentCharacter)
+  compressedString += "\(characterCount)"
+  let resultString = input.characters.count > compressedString.characters.count ? compressedString : input
+  return resultString
+}
+
+print("======= 1.6 Test Cases =======")
+print(compressString(input: "aabcccccaaa"))
+print(compressString(input: "a"))
+print(compressString(input: "aa"))
+print(compressString(input: "aabbb"))
+
+// 1.7
+// Given an NxN matrix, rotate it 90 degrees. Can you do this in place?
+// Easy solution is to just create NxN array and loop through and run simple algo
+// In place solution involves looping only N times and can do it in place
+// Implementation
+
+func rotateNxNMatrix(matrix: inout Array<[Int]>, dimension: Int) -> Array<Array<Int>> {
+  let n = dimension
+  for layer in 0..<(n / 2) {
+    let first = layer
+    let last = n - 1 - layer
+    for i in first..<last {
+      let offset = i - first
+      let leftCorner = matrix[first][i]
+      matrix[first][i] = matrix[last-offset][first]
+      matrix[last-offset][first] = matrix[last][last-offset]
+      matrix[last][last-offset] = matrix[i][last]
+      matrix[i][last] = leftCorner
+    }
+  }
+  return matrix
+}
+
+print("======= 1.7 Test Cases =======")
+var matrixInput = [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13 ,14, 15]]
+print(rotateNxNMatrix(matrix: &matrixInput, dimension: 4))
+
 
