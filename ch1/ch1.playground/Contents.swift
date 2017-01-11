@@ -234,4 +234,52 @@ print("======= 1.7 Test Cases =======")
 var matrixInput = [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13 ,14, 15]]
 print(rotateNxNMatrix(matrix: &matrixInput, dimension: 4))
 
+// 1.8
+// Given MxN matrix, if an element is 0, its entire row/column are set to 0
+// Implementation
+func zeroMatrix(matrix: inout Array<[Int]>) -> Array<Array<Int>> {
+  let numRows = matrix.count
+  if numRows == 0 {
+    return matrix
+  }
+  let numCols = matrix[0].count
+  var zeroedRows = Array.init(repeating: false, count: numRows)
+  var zeroedColumns = Array.init(repeating: false, count: numCols)
+  for m in 0..<numRows {
+    for n in 0..<numCols {
+      if matrix[m][n] == 0 {
+        zeroedRows[m] = true
+        zeroedColumns[n] = true
+      }
+    }
+  }
+  for m in 0..<numRows {
+    for n in 0..<numCols {
+      if zeroedRows[m] || zeroedColumns[n] {
+        matrix[m][n] = 0
+      }
+    }
+  }
+  return matrix
+}
+
+print("======= 1.8 Test Cases =======")
+var matrixInput4x4 = [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13 ,14, 15]]
+var matrixInput3x2 = [[0, 3], [0, 4], [1, 5], [2, 6]]
+print(zeroMatrix(matrix: &matrixInput4x4))
+print(zeroMatrix(matrix: &matrixInput3x2))
+
+
+// 1.9
+// Given two strings, s1 and s2, check if s2 is a rotation of s1 using only one call to isSubstring
+// Implementation
+func isRotation(first: String, second: String) -> Bool {
+  let extendedString = second + second
+  return extendedString.contains(first)
+}
+print("======= 1.0 Test Cases =======")
+print(isRotation(first: "waterbottle", second: "tlewaterbot"))
+print(isRotation(first: "waterbottle", second: "tlewaterbott"))
+print(isRotation(first: "abbba", second: "aabbb"))
+
 
