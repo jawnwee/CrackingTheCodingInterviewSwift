@@ -18,3 +18,46 @@ let squares = fibs.map({fib in fib * fib})
 print(squares)
 
 
+
+// Make this easier
+let names = ["Paula", "Elena", "Zoe"]
+var lastNameEndingInA: String?
+for name in names.reversed() where name.hasSuffix("a") {
+  lastNameEndingInA = name
+  break
+}
+
+print(lastNameEndingInA!)
+
+extension Sequence {
+  func last(where predicate: (Iterator.Element) -> Bool) -> Iterator.Element? {
+    for element in reversed() where predicate(element) {
+      return element
+    }
+    return nil
+  }
+}
+
+let newWayOfLastNameEndingInA = names.last { (n) -> Bool in
+  n.hasSuffix("a")
+}
+print(newWayOfLastNameEndingInA!)
+
+// Filter
+
+let nums = [1, 2, 3, 4, 5, 6, 7, 8]
+let filtered = nums.filter { num in num % 2 == 0 }
+print(filtered)
+
+// Reduce
+let fibss = [0, 1, 1, 2, 3, 5, 8, 13]
+let sum = fibss.reduce(0) { (total, n) -> Int in
+  return total + n
+}
+print(sum)
+
+let test = { (x: Int, y: Int) -> Int in
+  return x + y
+}
+
+print(test(3, 4))
