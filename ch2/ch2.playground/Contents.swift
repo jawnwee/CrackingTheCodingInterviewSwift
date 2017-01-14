@@ -119,3 +119,41 @@ func partitionLinkedList(headNode: Node<Int>, partition: Int) {
   }
   leftNode?.next = rightNode
 }
+
+// 2.5
+// Given 2 numbers represented by a linkedlist (stored in reversed order), add them up and return them as linkedlist
+// Idea is to multiply to extract and divide to make into linked list
+// Problem is returning list in proper order of 9 -> 1 -> 2 for 912. If we want it reversed, just assume a headNode reference exists
+// Implementation
+func sumLinkedLists(first: Node<Int>,
+                    second: Node<Int>) -> Node<Int> {
+  let firstNumber = sumLinkedListHelper(node: first)
+  let secondNumber = sumLinkedListHelper(node: second)
+  var summedNumber = firstNumber + secondNumber
+  var headNode: Node<Int>?
+  while summedNumber % 10 > 0 {
+    let digit = summedNumber % 10
+    summedNumber = summedNumber / 10
+    if headNode == nil {
+      headNode = Node.init(value: digit)
+    } else {
+      let newHeadNode = Node.init(value: digit)
+      newHeadNode.next = headNode
+      headNode = newHeadNode
+    }
+  }
+  return headNode!
+}
+
+func sumLinkedListHelper(node: Node<Int>) -> Int {
+  var sum = 0
+  var multiplier = 1
+  while node.next != nil {
+    sum += multiplier * node.value
+    multiplier *= 10
+  }
+  return sum
+}
+
+
+
