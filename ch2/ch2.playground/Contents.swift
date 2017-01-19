@@ -240,11 +240,12 @@ func findBeginningOfLoop(headNode: Node<Int>) -> Node<Int> {
     slowNode = slowNode.next!
     fastNode = (fastNode.next?.next)!
   }
-  while slowNode != headNode {
+  var node = headNode
+  while slowNode != node {
     slowNode = slowNode.next!
-    headNode = headNode.next!
+    node = node.next!
   }
   
-  return headNode
+  return node
 }
 
