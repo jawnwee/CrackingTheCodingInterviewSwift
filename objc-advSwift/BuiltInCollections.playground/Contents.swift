@@ -61,3 +61,23 @@ let test = { (x: Int, y: Int) -> Int in
 }
 
 print(test(3, 4))
+
+
+// test forEach
+extension Array where Element: Equatable {
+  func index(of element: Element) -> Int? {
+    for idx in self.indices where self[idx] == element {
+      return idx
+    }
+    return nil
+  }
+}
+
+let testArray = [1,3,5,6,1,3,2,1,7]
+print(testArray.index(of: 1)!)
+
+(1..<10).forEach { (t) in
+  print(t)
+  if t > 2 { return }
+}
+
