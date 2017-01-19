@@ -2,7 +2,7 @@
 
 import UIKit
 
-class Node<T> {
+class Node<T> : NSObject {
   
   var value: T
   var next: Node?
@@ -155,5 +155,96 @@ func sumLinkedListHelper(node: Node<Int>) -> Int {
   return sum
 }
 
+// 2.6
+// Given a linked list, check if the list is a palindrome
+// Idea is to recreate the linkedlist, but reverse it. Then check the two are equal
+// Implementation
+func isPalindrome(head: Node<Int>) -> Bool {
+  var isPalindrome = true
+  var reversedList = head
+  reversedList.next = nil
+  var currentHead = head
+  var tempHead = head
+  while tempHead.next != nil {
+    let newReversedListHead = Node.init(value: tempHead.value)
+    newReversedListHead.next = reversedList
+    reversedList = newReversedListHead
+    tempHead = tempHead.next!
+  }
+  
+  while currentHead.next != nil {
+    if reversedList.value != currentHead.value {
+      isPalindrome = false
+      break
+    }
+    reversedList = reversedList.next!
+    currentHead = currentHead.next!
+  }
+  
+  return isPalindrome
+}
 
+// 2.7
+// Given 2 singly linked lists, determine if intersect
+// The part that I missed was the fact that intersection means the last node is the same
+// Implementation
+func intersectingNode(first: Node<Int>, second: Node<Int>) -> Node<Int> {
+  var firstCount = 0
+  var secondCount = 0
+  var tempFirst: Node? = first
+  var tempSecond: Node? = second
+  if tempFirst != nil {
+    firstCount = 1
+  }
+  if tempSecond != nil {
+    secondCount = 1
+  }
+  while tempFirst?.next != nil {
+    tempFirst = tempFirst?.next!
+    firstCount += 1
+  }
+  while tempSecond?.next != nil {
+    tempSecond = tempSecond?.next!
+    secondCount += 1
+  }
+  
+  let isFirstLongerThanSecond = firstCount > secondCount ? true : false
+  let difference = abs(firstCount - secondCount)
+  
+  var startNode = isFirstLongerThanSecond == true ? first : second
+  
+  for _ in 0..<difference {
+    startNode = startNode.next!
+  }
+  var otherNode = isFirstLongerThanSecond == true ? second : first
+  var intersectNode: Node<Int>?
+  while otherNode.next != nil {
+    if otherNode == startNode {
+      intersectNode = otherNode
+      break
+    }
+    otherNode = otherNode.next!
+    startNode = startNode.next!
+  }
+  
+  return intersectNode!
+}
+
+// 2.8
+// Given circular linked list, implement algo to find node that begins the loop
+// Implementation
+func findBeginningOfLoop(headNode: Node<Int>) -> Node<Int> {
+  var slowNode = headNode
+  var fastNode = headNode
+  while slowNode != fastNode {
+    slowNode = slowNode.next!
+    fastNode = (fastNode.next?.next)!
+  }
+  while slowNode != headNode {
+    slowNode = slowNode.next!
+    headNode = headNode.next!
+  }
+  
+  return headNode
+}
 
