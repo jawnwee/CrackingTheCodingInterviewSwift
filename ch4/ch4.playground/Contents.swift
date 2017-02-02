@@ -99,6 +99,7 @@ class TreeNode<T> {
   var data: T
   var leftChild: TreeNode<T>?
   var rightChild: TreeNode<T>?
+  var parent: TreeNode<T>?
   
   init(_ data: T) {
     self.data = data
@@ -241,6 +242,199 @@ func formLinkedLists(root: TreeNode<Int>?) -> [LinkedNode<TreeNode<Int>>] {
 
   return listOfLinkedLists
 } */
+
+// 4.4
+// Given binary tree, determine if its balanced aka height the two subtrees of ANY node may never differ
+// by more than one
+// Idea: return -1 if heights are different by more than 1
+func isBalancedBst(treeNode: TreeNode<Int>) -> Bool {
+  return balanceBstHelper(treeNode: treeNode) != -1
+}
+
+func balanceBstHelper(treeNode: TreeNode<Int>?) -> Int {
+  if treeNode == nil {
+    return 0
+  }
+  
+  let leftHeight = balanceBstHelper(treeNode: treeNode!.leftChild)
+  let rightHeight = balanceBstHelper(treeNode: treeNode!.rightChild)
+  if rightHeight == -1 || leftHeight == -1 {
+    return -1
+  }
+  let difference = abs(leftHeight - rightHeight)
+  if difference > 1 {
+    return -1
+  }
+  return max(leftHeight, rightHeight)
+}
+
+// 4.5
+// Given binary tree, validate if it is a BST
+
+func isBst(treeNode: TreeNode<Int>?) -> Bool {
+  let leftSideMax = findMax(treeNode: treeNode!.leftChild)
+  let rightSideMax = findMin(treeNode: treeNode!.rightChild)
+  return leftSideMax < (treeNode?.data)! && rightSideMax > (treeNode?.data)!
+}
+
+func findMax(treeNode: TreeNode<Int>?) -> Int {
+  if treeNode!.leftChild == nil && treeNode!.rightChild == nil {
+    return treeNode!.data
+  }
+  
+  if ((treeNode?.leftChild) != nil) && treeNode!.rightChild == nil {
+    max(treeNode!.data, findMax(treeNode: treeNode?.leftChild))
+  }
+  
+  if ((treeNode?.rightChild) != nil) && treeNode!.leftChild == nil {
+    max(treeNode!.data, findMax(treeNode: treeNode?.rightChild))
+  }
+  
+  return max(findMax(treeNode: treeNode?.leftChild), findMax(treeNode: treeNode?.rightChild))
+}
+
+func findMin(treeNode: TreeNode<Int>?) -> Int {
+  if treeNode!.leftChild == nil && treeNode!.rightChild == nil {
+    return treeNode!.data
+  }
+  
+  
+  if ((treeNode?.leftChild) != nil) && treeNode!.rightChild == nil {
+    min(treeNode!.data, findMax(treeNode: treeNode?.leftChild))
+  }
+  
+  if ((treeNode?.rightChild) != nil) && treeNode!.leftChild == nil {
+    min(treeNode!.data, findMax(treeNode: treeNode?.rightChild))
+  }
+  
+  return min(findMax(treeNode: treeNode?.leftChild), findMax(treeNode: treeNode?.rightChild))
+}
+
+
+// 4.6
+// Given tree node, find the "next" node. Assume you have link to parent
+// Idea is to check what kind of node it is
+// Left means its parent and its .left the same and no left/right child
+// Root means it could have right or left
+// Right means its parent and its .right are the same and no left/right child
+// Assume passing in non nil node
+
+func nextNode(node: TreeNode<Int>) -> TreeNode<Int>? {
+  let isRootNode = checkIsRootNode(node)
+  let isLeftNode = checkIsLeftNode(node)
+  let nextNode: TreeNode<Int>?
+  if isLeftNode {
+    nextNode = node.parent!
+  } else if isRootNode {
+    if node.rightChild != nil {
+      nextNode = findLeftMostNode(node: node.rightChild!)
+    } else {
+      nextNode = findRootNode(node: node).0
+    }
+  } else {
+    let rootNodeTuple = findRootNode(node: node)
+    if rootNodeTuple.1 {
+      nextNode = rootNodeTuple.0
+    } else {
+      nextNode = nil
+    }
+  }
+  return nextNode
+}
+
+func checkIsRootNode(_ node: TreeNode<Int>) -> Bool {
+  return node.leftChild != nil || node.rightChild != nil
+}
+
+func checkIsLeftNode(_ node: TreeNode<Int>) -> Bool {
+  return node.parent?.leftChild === node && node.leftChild == nil && node.rightChild == nil
+}
+
+func findLeftMostNode(node: TreeNode<Int>) -> TreeNode<Int> {
+  if node.leftChild == nil {
+    return node
+  }
+  return findLeftMostNode(node: node.leftChild!)
+}
+
+func findRootNode(node: TreeNode<Int>) -> (TreeNode<Int>, Bool) {
+  if node.parent?.parent == nil {
+    let isLeftNode = node.parent?.leftChild === node
+    return (node.parent!, isLeftNode)
+  }
+  return findRootNode(node: node.parent!)
+}
+
+// 4.7
+// Given list of projects and list of dependencies (a tuple of (p1, p2) where p2 depends on p1 being built first)
+// Find a build order that allows the projects to be built
+// Left this one uncoded was just too lazy to make the graph
+// 1) Create graph and a hashmap of dependencies
+// 2) Keep a stack of built projects and check and remove from graph/hashmap and put in stack the nodes
+// 3) Iterate through stack and repeat
+// 4) If Stack isnt empty, return error, else succeeded with build
+
+
+// 4.8
+// First common ancestor of two nodes in a binary tree
+// Idea is to use post order traversal
+// Implementation
+func firstCommonAncestor(node: TreeNode<Int>?,
+                         n1: TreeNode<Int>,
+                         n2: TreeNode<Int>) -> TreeNode<Int>? {
+  if node == nil {
+    return nil
+  }
+  let leftSubTreeFoundAncestor = firstCommonAncestor(node: node?.leftChild, n1: n1, n2: n2)
+  let rightSubTreeFoundAncestor = firstCommonAncestor(node: node?.rightChild, n1: n1, n2: n2)
+  if leftSubTreeFoundAncestor != nil  && rightSubTreeFoundAncestor != nil {
+    return node
+  }
+  let isNodePartOfSearch = node === n1 || node === n2
+  if isNodePartOfSearch && (leftSubTreeFoundAncestor == nil || rightSubTreeFoundAncestor == nil) {
+    return node
+  } else {
+    if leftSubTreeFoundAncestor != nil {
+      return leftSubTreeFoundAncestor
+    } else if rightSubTreeFoundAncestor != nil {
+      return rightSubTreeFoundAncestor
+    } else {
+      return nil
+    }
+  }
+  
+}
+
+// 4.9
+// A Bst gets build from an array, build all possible arrays
+// Idea:
+// 1) root (left) (right)
+// 2) root (right) (left)
+// 3) root left.data (right) (left)
+// 4) root left.data (left) (right)
+// 5) root right.data (right) (left)
+// 6) root right.data (left) (right)
+
+// 4.10
+// Given 2 large trees, check if t2 is in t1
+// Use pre order and put nulls at every empty node
+// check substring of another
+
+// 4.11
+// Implement binary tree class to insert, find, delete, and getRandomNode
+// Implement getRandomNode
+// Pick random number 0-N
+// keep track of size of left and right tree and if number is equal to
+// selected one, pick that one
+
+// 4.12
+// Given binary tree, return number of paths that let sum up to a value
+// can be any path start -> some middle value
+
+
+
+
+
 
 
 
