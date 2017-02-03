@@ -120,21 +120,21 @@ func binarySearch(listy: [Int], value: Int, endIndex: Int) -> Int {
 func sparseSearch(string: String, arr: [String]) -> Int {
   var low = 0
   var high = arr.count - 1
-  let index: Int
+  var index: Int = -1
   
   func findNextNonEmptyLowMidHigh(low: Int, high:Int) -> (low: Int, mid: Int, high: Int) {
     var newLow = low
     var newHigh = high
     var mid = (high + low) / 2
-    while arr[low] == "" && arr[mid] == "" && arr[high] == "" {
+    while arr[newLow] == "" || arr[mid] == "" || arr[newHigh] == "" {
       if arr[newLow] == "" {
         newLow += 1
       }
       if arr[mid] == "" {
-        mid += 1
+        mid -= 1
       }
       if arr[newHigh] == "" {
-        newHigh += 1
+        newHigh -= 1
       }
     }
     return (newLow, mid, newHigh)
@@ -148,11 +148,14 @@ func sparseSearch(string: String, arr: [String]) -> Int {
       low = adjustedIndices.mid + 1
     } else {
       index = adjustedIndices.mid
+      break
     }
   }
   return index
 }
 
+print(sparseSearch(string: "ball", arr: ["at", "", "", "", "ball", "", "", "car", "", "", "dad", "", ""]))
 
-
+// 10.6
+// Uhh skip this lol
 
