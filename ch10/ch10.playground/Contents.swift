@@ -159,3 +159,151 @@ print(sparseSearch(string: "ball", arr: ["at", "", "", "", "ball", "", "", "car"
 // 10.6
 // Uhh skip this lol
 
+// 10.7 and 10.8 were asking for bit stuff. Somewhat interesting I guess
+
+// 10.9
+// Given MxN matrix, sorted in asc order in both row and col. find value
+
+func findValue(matrix: [[Int]], val:Int) -> (Int, Int) {
+  var found = (-1, -1)
+  if matrix.count == 0 {
+    return found
+  }
+  let mCount = matrix.count
+  let nCount = matrix[0].count
+  var elementCount = mCount * nCount
+  var lowIndex = (0, 0)
+  var highIndex = (mCount - 1, nCount - 1)
+  while lowIndex.0 <= highIndex.0 && lowIndex.1 <= highIndex.1 {
+    elementCount /= 2
+    let mid = matrixPointHelper(original: lowIndex, moveBy: elementCount, maxM: mCount, maxN: nCount)
+    if (matrix[mid.0][mid.1] > val) {
+      highIndex = matrixPointHelper(original: mid, moveBy: -1, maxM: mCount, maxN: nCount)
+    } else if (matrix[mid.0][mid.1] < val) {
+      lowIndex = matrixPointHelper(original: mid, moveBy: 1, maxM: mCount, maxN: nCount)
+    } else {
+      found = mid
+      break
+    }
+  }
+  return found
+}
+
+func matrixPointHelper(original:(Int, Int), moveBy: Int, maxM: Int, maxN: Int) -> (Int, Int) {
+  let adjustedN = original.1 + moveBy
+  var movedPoint = (original.0, adjustedN)
+  if adjustedN > maxN {
+    let rowAdjustment = adjustedN / maxM
+    let colAdjustment = adjustedN % maxM
+    movedPoint = (rowAdjustment, colAdjustment)
+  } else if adjustedN < 0 {
+    var additionalRowShift = 0
+    if abs(adjustedN) > maxM {
+      additionalRowShift = abs(adjustedN) / maxM
+    }
+    let rowAdjustment = 1 + additionalRowShift
+    let colAdjustment = abs(adjustedN + maxN) % maxM
+    movedPoint = (original.0 - rowAdjustment, colAdjustment)
+  }
+  return movedPoint
+}
+
+// Ugh Improvements that couldve been made to this solution
+// Only really needed to work down diagonally from top right corner.., didnt actually have to do the middle
+// However, to even further do the expansion. The solution works by finding which quadrant to recurse through because you can tell
+// from the corners of the middle.
+
+// 10.10
+// Given a stream of numbers, implement data structure to properly track each number, and get rank
+// rank is count of all elements <= x
+// Idea is to have a linkedlist with a rank attached to them and also a hashmap with current rank for lookup
+// Track is O(n), but look up is O(1)
+// Book says to use a BST so that insert and look up are O(logN), but if tree is unbalanced, lookup will be O(N). Tradeoffs.
+
+
+// 10.11
+// Given array of integers, sort into alternating seq of peak and valley
+// peak is when num is > its adj number and valley is the opposite
+// Idea: sort array and start from both ends and alternate each one until the middle/no more
+// O(nlogn)
+func sortArray(arr: [Int], start: Int, end: Int) -> [Int] {
+  if start == end {
+    return [arr[start]]
+  }
+  let mid = (start + end) / 2
+  var leftIndex = 0
+  var rightIndex = 0
+  let leftSorted = sortArray(arr: arr, start: start, end: mid)
+  let rightSorted = sortArray(arr: arr, start: mid + 1, end: end)
+  var sortedArray = [Int]()
+  while leftIndex != leftSorted.count || rightIndex != rightSorted.count {
+    if leftIndex != leftSorted.count && rightIndex != rightSorted.count {
+      if leftSorted[leftIndex] <= rightSorted[rightIndex] {
+        sortedArray.append(leftSorted[leftIndex])
+        leftIndex += 1
+      } else {
+        sortedArray.append(rightSorted[rightIndex])
+        rightIndex += 1
+      }
+    } else if leftIndex == leftSorted.count {
+      sortedArray.append(rightSorted[rightIndex])
+      rightIndex += 1
+    } else {
+      sortedArray.append(leftSorted[leftIndex])
+      leftIndex += 1
+    }
+  }
+  return sortedArray
+}
+
+func sortToPeaksAndValley(arr: [Int]) -> [Int] {
+  let sortedArray: [Int] = sortArray(arr: arr, start: 0, end: (arr.count - 1))
+  let lastIndex = sortedArray.count - 1
+  var index = 0
+  var sortedToPeaksAndValley = [Int]()
+  while index != (lastIndex - index) {
+    sortedToPeaksAndValley.append(sortedArray[lastIndex - index])
+    sortedToPeaksAndValley.append(sortedArray[index])
+    index += 1
+  }
+  if sortedArray.count % 2 == 1 {
+    sortedToPeaksAndValley.append(sortedArray[index])
+  }
+  return sortedToPeaksAndValley
+}
+
+print(sortToPeaksAndValley(arr: [5,3,1,2,3]))
+print(sortToPeaksAndValley(arr: [5, 8, 6, 2, 3, 4, 6]))
+
+// Improved solution involves just shifting the window
+func sortValleyPeakImproved(arr: inout [Int]) -> [Int] {
+  for i in stride(from: 1, to: arr.count, by: 2) {
+    let biggestIndex = maxIndex(arr: arr, a: i-1, b: i, c: i+1)
+    if i != biggestIndex {
+      swap(arr: &arr, left: i, right: biggestIndex)
+    }
+  }
+  return arr
+}
+
+func swap(arr: inout [Int], left: Int, right: Int) {
+  let temp = arr[left]
+  arr[left] = arr[right]
+  arr[right] = temp
+}
+
+func maxIndex(arr: [Int], a: Int, b: Int, c: Int) -> Int {
+  let len = arr.count
+  let aValue = a >= 0 && a < len ? arr[a] : nil
+  let bValue = b >= 0 && b < len ? arr[b] : nil
+  let cValue = c >= 0 && c < len ? arr[c] : nil
+  let values: [Int] = [aValue!, bValue!, cValue!]
+  let max = values.max()
+  if aValue == max {
+    return a
+  } else if bValue == max {
+    return b
+  } else {
+    return c
+  }
+}
