@@ -122,7 +122,71 @@ func multiplyRecursively(a: Int, b: Int) -> Int {
 
 print (multiplyRecursively(a: 26, b: 5))
 
+// 8.6
+// Towers of hannoi
 
+struct Stack<T> {
+  var array = [T]()
+  
+  var isEmpty: Bool {
+    return array.isEmpty
+  }
+  
+  var count: Int {
+    return array.count
+  }
+  
+  mutating func push(_ element: T) {
+    array.append(element)
+  }
+  
+  mutating func pop() -> T? {
+    return array.popLast()
+  }
+  
+  var top: T? {
+    return array.last
+  }
+  
+}
+
+func towersOfHannoi(n: Int) {
+  var s1 = Stack<Int>.init()
+  var s2 = Stack<Int>.init()
+  var s3 = Stack<Int>.init()
+  for index in stride(from: n, to: 1, by: -1) {
+    s1.push(index)
+  }
+  
+  func moveDisks(value: Int, destination: Stack<Int>, buffer: Stack<Int>) {
+    if value > 0 {
+      moveDisks(value: value - 1, destination: buffer, buffer: destination)
+      var origin = s1
+      let top = origin.pop()
+      
+      var destination = s2
+      destination.push(top!)
+      
+    }
+  }
+  
+  func towersOfHannoiHelper(s1: Stack<Int>, s2: Stack<Int>, s3: Stack<Int>, value: Int) {
+    if value <= 0 {
+      return
+    }
+    towersOfHannoiHelper(s1: s1, s2: s3, s3: s2, value: value - 1)
+    
+    var origin = s1
+    let top = origin.pop()
+    
+    var destination = s2
+    destination.push(top!)
+    
+    towersOfHannoiHelper(s1: s3, s2: s2, s3: s1, value: value - 1)
+  }
+  
+  towersOfHannoiHelper(s1: s1, s2: s2, s3: s3, value: n)
+}
 
 
 
