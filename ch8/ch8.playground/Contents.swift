@@ -124,6 +124,7 @@ print (multiplyRecursively(a: 26, b: 5))
 
 // 8.6
 // Towers of hannoi
+// hard problem myeh.
 
 struct Stack<T> {
   var array = [T]()
@@ -188,7 +189,189 @@ func towersOfHannoi(n: Int) {
   towersOfHannoiHelper(s1: s1, s2: s2, s3: s3, value: n)
 }
 
+// 8.7
+// Permutations without dups. Write a method to get all permutations of a a string with unique characters
+// Naive solution is to start from 1 character. and for each of the remaining characters. find permutations of those
+// recursivley :(
 
+func calculatePermutations(string: String) -> [String] {
+  if string.characters.count == 1 {
+    return [string]
+  }
+  var resultPermutations = [String]()
+  for i in string.characters {
+    let charString = String(i)
+    let remainingLetters = string.replacingOccurrences(of: String(i), with:"")
+    let permutationsOfRemaining = calculatePermutations(string: remainingLetters)
+    for permutation in permutationsOfRemaining {
+      let resultString = charString + permutation
+      resultPermutations.append(resultString)
+    }
+  }
+  return resultPermutations
+}
+
+// 8.8
+// Permutation with dupes.
+// Naive way was to do same as above and just not add duplicates
+// Better way is to keep count of all letters. Then recursively pass down map with less count of the character
+// Implementation
+
+func permutationWithDupes(string: String){
+  var result = [String]()
+  let map = freqMap(string: string)
+  printPerms(map: map, prefix: "", remaining: string.characters.count, result: &result)
+}
+
+func printPerms(map: [String : Int], prefix: String, remaining: Int, result: inout [String]) {
+  if remaining == 0 {
+    result.append(prefix)
+    return
+  }
+  var currentMap = map
+  for c in map.keys {
+    let count = map[c]
+    if count! > 0 {
+      currentMap[c]! -= 1
+      printPerms(map: currentMap, prefix: prefix + c, remaining: remaining - 1, result: &result)
+      currentMap[c]! = count!
+    }
+  }
+}
+
+func freqMap(string: String) -> [String : Int] {
+  var map = [String : Int]()
+  for c in string.characters {
+    let charString = String(c)
+    if map[charString] == nil {
+      map[charString] = 1
+    } else {
+      map[charString]! += 1
+    }
+  }
+  return map
+}
+
+// 8.9
+// Given an input n, print out all valid properly open and closed combination of parenthesis
+// input 2: -> ()(), (())
+// Idea: use left and right paren and count
+
+func addParen(list: inout [String], leftRemaining: Int, rightRemaining: Int, string: inout [Character], index: Int) {
+  if leftRemaining < 0 || rightRemaining < leftRemaining {
+    return
+  }
+  if leftRemaining == 0 && rightRemaining == 0 {
+    list.append(String(string))
+  } else {
+    string[index] = "("
+    addParen(list: &list, leftRemaining: leftRemaining - 1, rightRemaining: rightRemaining, string: &string, index: index + 1)
+    
+    string[index] = ")"
+    addParen(list: &list, leftRemaining: leftRemaining, rightRemaining: rightRemaining - 1, string: &string, index: index + 1)
+  }
+}
+
+func generateParens(n: Int) -> [String] {
+  var parenList = [String]()
+  var charList = Array(repeating: Character(""), count: n * 2)
+  addParen(list: &parenList, leftRemaining: n, rightRemaining: n, string: &charList, index: 0)
+  return parenList
+}
+
+
+// 8.10
+// Given a screen, paint fill with a color, given a point.
+// Idea: use recursion, but make sure to keep track of visited points
+
+enum Color {
+  case White
+  case Black
+  case Blue
+}
+
+func paintFill(screen: [[Color]], row: Int, col: Int, newColor: Color) {
+  var currentScreen = screen
+  let colorToChange = screen[row][col]
+  let rowMaxBound = screen.count
+  let colMaxBound = screen[0].count
+  var visitedMatrix = Array<Array<Bool>>()
+  for column in 0...colMaxBound {
+    visitedMatrix.append(Array(repeating:false, count:rowMaxBound))
+  }
+  func paintFillHelper(screen: inout [[Color]], row: Int, col: Int) {
+    if row < 0 || row >= rowMaxBound {
+      return
+    } else if col < 0 || col >= colMaxBound {
+      return
+    } else if visitedMatrix[row][col] == true {
+      return
+    }
+    visitedMatrix[row][col] = true
+    if screen[row][col] == colorToChange {
+      screen[row][col] = newColor
+    }
+    paintFillHelper(screen: &screen, row: row - 1, col: col)
+    paintFillHelper(screen: &screen, row: row + 1, col: col)
+    paintFillHelper(screen: &screen, row: row, col: col + 1)
+    paintFillHelper(screen: &screen, row: row, col: col - 1)
+  }
+  paintFillHelper(screen: &currentScreen, row: row, col: col)
+}
+
+// 10.11
+// Given infinite number of coins, write code to calculate number of ways representing n cents
+// Idea is to recursively go through and memoize
+
+func coins(n : Int) -> Int {
+  var memoizeMap = [String: Int]()
+  func coinsCounter(n: Int) -> Int {
+    if n == 0 {
+      return 1
+    } else if n < 0 {
+      return 0
+    }
+    var useQuarter = 0
+    var useDime = 0
+    var useNickel = 0
+    var usePenny = 0
+    
+    let subQuarter = n - 25
+    if memoizeMap[String(subQuarter)] == nil {
+      useQuarter = coinsCounter(n: subQuarter)
+      memoizeMap[String(subQuarter)] = useQuarter
+    } else {
+      useQuarter = memoizeMap[String(subQuarter)]!
+    }
+    
+    let subDime = n - 10
+    if memoizeMap[String(subDime)] == nil {
+      useDime = coinsCounter(n: subDime)
+      memoizeMap[String(subDime)] = useDime
+    } else {
+      useDime = memoizeMap[String(subDime)]!
+    }
+    
+    let subNickel = n - 5
+    if memoizeMap[String(subNickel)] == nil {
+      useNickel = coinsCounter(n: subNickel)
+      memoizeMap[String(subNickel)] = useNickel
+    } else {
+      useNickel = memoizeMap[String(subNickel)]!
+    }
+    
+    let subPenny = n - 1
+    if memoizeMap[String(subPenny)] == nil {
+      usePenny = coinsCounter(n: subQuarter)
+      memoizeMap[String(subPenny)] = usePenny
+    } else {
+      usePenny = memoizeMap[String(subPenny)]!
+    }
+
+    return useQuarter + useDime + useNickel + usePenny
+  }
+  return coinsCounter(n: n)
+}
 
 
 
